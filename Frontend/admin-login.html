@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - AI Admission System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: var(--color-bg);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .login-layout {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .login-left {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: var(--color-surface);
+        }
+
+        .login-right {
+            flex: 1;
+            background: var(--gradient-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-right::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .login-right {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-layout">
+        <div class="login-left">
+            <div class="login-card">
+                <div class="login-header">
+                    <a href="index.html" class="login-logo">
+                        <i data-lucide="graduation-cap" size="32"></i>
+                        UniAdmit<span class="text-text">Admin</span>
+                    </a>
+                    <h2 class="mb-2">Welcome Back</h2>
+                    <p class="text-text-light">Please enter your credentials to access the dashboard.</p>
+                </div>
+
+                <form id="adminLoginForm">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <div style="position: relative;">
+                            <i data-lucide="mail" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-light);" size="18"></i>
+                            <input type="email" id="email" class="form-control" style="padding-left: 2.75rem;" required placeholder="admin@university.edu" value="admin@university.edu">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-6">
+                        <div class="flex justify-between mb-2">
+                            <label class="form-label" style="margin: 0;">Password</label>
+                            <a href="#" style="font-size: 0.875rem;">Forgot Password?</a>
+                        </div>
+                        <div style="position: relative;">
+                            <i data-lucide="lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-light);" size="18"></i>
+                            <input type="password" id="password" class="form-control" style="padding-left: 2.75rem;" required placeholder="••••••••" value="password">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 mb-6">
+                        <input type="checkbox" id="remember" style="width: 1rem; height: 1rem;">
+                        <label for="remember" class="text-sm text-text-light">Remember me for 30 days</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        Sign In <i data-lucide="log-in" size="18"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="login-right">
+            <i data-lucide="shield-check" size="120" style="margin-bottom: 2rem; opacity: 0.9;"></i>
+            <h2 style="color: white; font-size: 2.5rem; text-align: center; margin-bottom: 1rem;">Secure Admission Management</h2>
+            <p style="text-align: center; font-size: 1.1rem; opacity: 0.8; max-width: 400px;">Review applications, manage student data, and streamline the admission process with AI-powered insights.</p>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('http://localhost:4003/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    localStorage.setItem('adminToken', result.data.token);
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    alert(result.message || 'Login failed');
+                }
+            } catch (error) {
+                console.error('Error logging in:', error);
+                alert('An error occurred during login. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

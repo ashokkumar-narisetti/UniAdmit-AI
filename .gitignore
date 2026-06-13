@@ -1,0 +1,29 @@
+# Environment files
+.env
+Backend/.env
+ML/.env
+
+# Node modules
+Backend/node_modules/
+Frontend/node_modules/
+
+# Uploaded documents
+Backend/uploads/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Python virtual environment
+venv/
+.venv/
+env/
+
+# VS Code
+.vscode/
+
+# IntelliJ / PyCharm
+.idea/
+
+# Logs
+*.log

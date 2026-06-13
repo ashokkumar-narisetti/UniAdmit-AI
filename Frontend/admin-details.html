@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Details - AI Admission System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: var(--color-bg);
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 260px; background: var(--color-surface); border-right: 1px solid var(--color-border);
+            display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 40;
+        }
+        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--color-border); }
+        .sidebar-nav { padding: 1rem 0; flex: 1; }
+        .nav-item {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem;
+            color: var(--color-text-light); font-weight: 500; transition: all var(--transition-fast);
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(37, 99, 235, 0.05); color: var(--color-primary); border-left: 3px solid var(--color-primary); }
+
+        .main-content {
+            flex: 1; margin-left: 260px; display: flex; flex-direction: column;
+        }
+        
+        .topbar {
+            height: 70px; background: var(--color-surface); border-bottom: 1px solid var(--color-border);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 30;
+        }
+
+        .page-container { padding: 2rem; }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-text-light);
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            transition: color var(--transition-fast);
+        }
+        .back-link:hover { color: var(--color-primary); }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .info-group {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .info-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .info-label {
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+            margin-bottom: 0.25rem;
+        }
+        .info-value {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .doc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            background: var(--color-bg);
+            transition: border-color var(--transition-fast);
+        }
+        .doc-item:hover { border-color: var(--color-primary); }
+
+        .timeline-small {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        .timeline-small::before {
+            content: ''; position: absolute; top: 0; bottom: 0; left: 7px; width: 2px; background: var(--color-border);
+        }
+        .timeline-item-sm {
+            position: relative; margin-bottom: 1.5rem;
+        }
+        .timeline-item-sm::before {
+            content: ''; position: absolute; left: -1.5rem; top: 5px; width: 16px; height: 16px; border-radius: 50%;
+            background: var(--color-surface); border: 2px solid var(--color-primary); z-index: 1;
+        }
+        .timeline-item-sm.done::before { background: var(--color-primary); }
+        .timeline-date { font-size: 0.75rem; color: var(--color-text-light); }
+
+        @media (max-width: 1024px) {
+            .details-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <!-- Sidebar Content -->
+        <div class="sidebar-header">
+            <a href="index.html" class="logo text-lg"><i data-lucide="graduation-cap"></i>UniAdmit<span class="text-primary">Admin</span></a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html" class="nav-item"><i data-lucide="layout-dashboard" size="20"></i> Dashboard</a>
+            <a href="admin-applications.html" class="nav-item active"><i data-lucide="users" size="20"></i> Applications</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="font-bold text-lg">Application Details</div>
+        </header>
+
+        <div class="page-container">
+            <a href="admin-applications.html" class="back-link">
+                <i data-lucide="arrow-left" size="18"></i> Back to Applications
+            </a>
+
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-4">
+                    <h2 class="mb-0" id="applicantNameHeader">Loading...</h2>
+                    <span class="badge badge-warning" id="statusBadge">Loading...</span>
+                    <span class="text-sm text-text-light font-mono" id="applicationIdDisplay">ID: ...</span>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn btn-outline" style="color: var(--color-danger); border-color: var(--color-danger);" onclick="updateStatus('Rejected')">
+                        <i data-lucide="x-circle" size="18"></i> Reject
+                    </button>
+                    <button class="btn btn-primary" style="background: var(--color-success); border-color: var(--color-success); box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);" onclick="updateStatus('Approved')">
+                        <i data-lucide="check-circle" size="18"></i> Approve
+                    </button>
+                </div>
+            </div>
+
+            <div class="details-grid">
+                <!-- Left Column -->
+                <div class="flex-col gap-6">
+                    <div class="card">
+                        <h3 class="mb-4">Applicant Information</h3>
+                        
+                        <div class="info-group">
+                            <h4 class="text-primary mb-3 text-sm uppercase tracking-wider">Personal Details</h4>
+                            <div class="info-grid">
+                                <div><div class="info-label">Full Name</div><div class="info-value" id="valFullName">-</div></div>
+                                <div><div class="info-label">Email</div><div class="info-value" id="valEmail">-</div></div>
+                                <div><div class="info-label">Phone</div><div class="info-value" id="valPhone">-</div></div>
+                                <div><div class="info-label">Date of Birth</div><div class="info-value" id="valDob">-</div></div>
+                                <div><div class="info-label">Gender</div><div class="info-value" id="valGender">-</div></div>
+                                <div><div class="info-label">Category</div><div class="info-value" id="valCategory">-</div></div>
+                            </div>
+                        </div>
+
+                        <div class="info-group">
+                            <h4 class="text-primary mb-3 text-sm uppercase tracking-wider">Academic Background</h4>
+                            <div class="info-grid">
+                                <div><div class="info-label">10th Board</div><div class="info-value" id="valTenthBoard">-</div></div>
+                                <div><div class="info-label">10th Percentage</div><div class="info-value" id="valTenthPct">-</div></div>
+                                <div><div class="info-label">12th Board</div><div class="info-value" id="valInterBoard">-</div></div>
+                                <div><div class="info-label">12th Percentage</div><div class="info-value" id="valInterPct">-</div></div>
+                                <div style="grid-column: span 2;"><div class="info-label">Previous School/College</div><div class="info-value" id="valPrevSchool">-</div></div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-group">
+                            <h4 class="text-primary mb-3 text-sm uppercase tracking-wider">Course Applied</h4>
+                            <div class="info-grid">
+                                <div style="grid-column: span 2;"><div class="info-label">Program</div><div class="info-value text-lg font-bold" id="valCourse">-</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="flex-col gap-6">
+                    <div class="card" id="aiPredictionCard">
+                        <h3 class="mb-4 flex items-center gap-2">
+                            <i data-lucide="sparkles" class="text-primary" size="20"></i>
+                            AI Eligibility Prediction
+                        </h3>
+                        <div class="p-4 rounded border flex flex-col gap-3" id="aiPredictionContent" style="background: var(--color-bg);">
+                            <div class="flex items-center gap-3">
+                                <div id="aiPredictionIcon"><i data-lucide="loader" class="text-text-light spin" size="24"></i></div>
+                                <div>
+                                    <div class="font-bold text-lg" id="aiPredictionStatus">Analyzing...</div>
+                                    <div class="text-sm text-text-light" id="aiPredictionConfidence">Waiting for ML Model</div>
+                                </div>
+                            </div>
+                            <div id="geminiRecommendation" class="text-sm text-text mt-2 pt-3 border-t" style="display: none; border-color: var(--color-border);">
+                                <!-- Recommendation will go here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="mb-4">Documents</h3>
+                        
+                        <div class="doc-item">
+                            <div class="flex items-center gap-3">
+                                <div style="color: #EF4444;"><i data-lucide="file-text" size="24"></i></div>
+                                <div>
+                                    <div class="font-medium text-sm">10th_Memo_JohnDoe.pdf</div>
+                                    <div class="text-xs text-text-light">1.2 MB</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" onclick="viewDoc('10th Memo')">View</button>
+                        </div>
+                        
+                        <div class="doc-item">
+                            <div class="flex items-center gap-3">
+                                <div style="color: #EF4444;"><i data-lucide="file-text" size="24"></i></div>
+                                <div>
+                                    <div class="font-medium text-sm">12th_Memo_JohnDoe.pdf</div>
+                                    <div class="text-xs text-text-light">2.1 MB</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" onclick="viewDoc('12th Memo')">View</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="mb-4">Application Timeline</h3>
+                        <div class="timeline-small">
+                            <div class="timeline-item-sm done">
+                                <div class="font-medium text-sm">Application Submitted</div>
+                                <div class="timeline-date">June 12, 2026 - 10:30 AM</div>
+                            </div>
+                            <div class="timeline-item-sm done">
+                                <div class="font-medium text-sm">Documents Uploaded</div>
+                                <div class="timeline-date">June 12, 2026 - 10:35 AM</div>
+                            </div>
+                            <div class="timeline-item-sm">
+                                <div class="font-medium text-sm text-primary">Under Review</div>
+                                <div class="timeline-date">Pending</div>
+                            </div>
+                            <div class="timeline-item-sm">
+                                <div class="font-medium text-sm text-text-light">Decision Made</div>
+                                <div class="timeline-date">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Document Viewer Modal (Simulated) -->
+    <div id="docModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="card" style="width: 80%; max-width: 900px; height: 80vh; display: flex; flex-direction: column;">
+            <div class="flex justify-between items-center mb-4 pb-4 border-b border-color-border">
+                <h3 id="docTitle">Document View</h3>
+                <button onclick="document.getElementById('docModal').style.display='none'" style="background: none; border: none; cursor: pointer; color: var(--color-text-light);"><i data-lucide="x"></i></button>
+            </div>
+            <div style="flex: 1; background: #f1f5f9; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); overflow: hidden;">
+                <iframe id="docIframe" src="" style="width: 100%; height: 100%; border: none; display: none;"></iframe>
+                <div id="docPlaceholder" class="text-center text-text-light">
+                    <i data-lucide="file-search" size="64" style="margin: 0 auto 1rem auto; opacity: 0.5;"></i>
+                    <p>Document not available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        const BASE_URL = 'http://localhost:4003/api';
+        const urlParams = new URLSearchParams(window.location.search);
+        const applicationId = urlParams.get('id');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            if (applicationId) {
+                await loadApplicationDetails(applicationId, token);
+            } else {
+                alert('No application ID found.');
+            }
+        });
+
+        async function loadApplicationDetails(id, token) {
+            try {
+                const response = await fetch(`${BASE_URL}/applications/${id}/details`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    populateDetails(result.data);
+                    loadAIPrediction(id, token);
+                } else {
+                    alert(result.message || 'Failed to load details');
+                }
+            } catch (error) {
+                console.error('Error fetching details:', error);
+                alert('Error fetching application details');
+            }
+        }
+
+        async function loadAIPrediction(id, token) {
+            try {
+                const response = await fetch(`${BASE_URL}/applications/${id}/predict`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                
+                const iconContainer = document.getElementById('aiPredictionIcon');
+                const statusEl = document.getElementById('aiPredictionStatus');
+                const confEl = document.getElementById('aiPredictionConfidence');
+                const recEl = document.getElementById('geminiRecommendation');
+                
+                if (result.success && result.data) {
+                    const prediction = result.data.prediction;
+                    const confidence = result.data.confidence;
+                    const recommendation = result.data.recommendation;
+                    
+                    if (prediction === 'ELIGIBLE') {
+                        iconContainer.innerHTML = '<i data-lucide="check-circle" class="text-success" size="32"></i>';
+                        statusEl.textContent = 'Eligible for Admission';
+                        statusEl.style.color = 'var(--color-success)';
+                        confEl.textContent = `Confidence: ${confidence}%`;
+                    } else {
+                        iconContainer.innerHTML = '<i data-lucide="x-circle" class="text-danger" size="32"></i>';
+                        statusEl.textContent = 'Not Eligible';
+                        statusEl.style.color = 'var(--color-danger)';
+                        confEl.textContent = `Confidence: ${confidence}%`;
+                    }
+                    
+                    if (recommendation) {
+                        recEl.innerHTML = `<div class="font-semibold mb-1 text-primary"><i data-lucide="bot" size="16" class="inline mr-1"></i>Gemini Recommendation:</div>${recommendation.replace(/\n/g, '<br>')}`;
+                        recEl.style.display = 'block';
+                    }
+                } else {
+                    iconContainer.innerHTML = '<i data-lucide="alert-triangle" class="text-warning" size="32"></i>';
+                    statusEl.textContent = 'Prediction Failed';
+                    confEl.textContent = 'Unable to reach ML server';
+                }
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Error fetching prediction:', error);
+                document.getElementById('aiPredictionIcon').innerHTML = '<i data-lucide="alert-triangle" class="text-warning" size="32"></i>';
+                document.getElementById('aiPredictionStatus').textContent = 'Error';
+                document.getElementById('aiPredictionConfidence').textContent = 'Server error occurred';
+                lucide.createIcons();
+            }
+        }
+
+        function populateDetails(data) {
+            if (!data || data.length === 0) {
+                alert('Application not found');
+                return;
+            }
+            
+            const app = data[0]; // The first row contains the application and academic details
+            
+            document.getElementById('applicantNameHeader').textContent = app.full_name;
+            document.getElementById('applicationIdDisplay').textContent = `ID: ${app.id}`;
+            
+            const badge = document.getElementById('statusBadge');
+            badge.innerText = app.status;
+            if (app.status === 'APPROVED') badge.className = 'badge badge-success';
+            else if (app.status === 'REJECTED') badge.className = 'badge badge-danger';
+            else if (app.status === 'UNDER_REVIEW') badge.className = 'badge badge-warning';
+            else badge.className = 'badge badge-primary';
+
+            document.getElementById('valFullName').textContent = app.full_name;
+            document.getElementById('valEmail').textContent = app.email;
+            document.getElementById('valPhone').textContent = app.phone;
+            document.getElementById('valDob').textContent = new Date(app.date_of_birth).toLocaleDateString();
+            document.getElementById('valGender').textContent = app.gender;
+            document.getElementById('valCategory').textContent = app.category;
+            
+            const docs = data.filter(row => row.document_type);
+            const tenth = docs.find(d => d.document_type === 'TENTH_MEMO');
+            const inter = docs.find(d => d.document_type === 'INTER_MEMO');
+
+            document.getElementById('valTenthBoard').textContent = app.tenth_board || '-';
+            document.getElementById('valTenthPct').textContent = app.tenth_percentage ? app.tenth_percentage + '%' : '-';
+            document.getElementById('valInterBoard').textContent = app.inter_board || '-';
+            document.getElementById('valInterPct').textContent = app.inter_percentage ? app.inter_percentage + '%' : '-';
+            document.getElementById('valPrevSchool').textContent = app.inter_college_name || app.tenth_school_name || '-';
+            
+            document.getElementById('valCourse').textContent = app.course;
+            
+            // Render docs
+            if (tenth) {
+                document.querySelector('.doc-item:nth-child(2) .font-medium').textContent = tenth.file_name || '10th_Memo.pdf';
+                document.querySelector('.doc-item:nth-child(2) button').style.display = 'inline-block';
+                document.querySelector('.doc-item:nth-child(2) button').onclick = () => viewDoc('10th Memo', tenth.file_path);
+            } else {
+                document.querySelector('.doc-item:nth-child(2) .font-medium').textContent = 'Not Uploaded';
+                document.querySelector('.doc-item:nth-child(2) .text-xs').textContent = '';
+                document.querySelector('.doc-item:nth-child(2) button').style.display = 'none';
+            }
+
+            if (inter) {
+                document.querySelector('.doc-item:nth-child(3) .font-medium').textContent = inter.file_name || '12th_Memo.pdf';
+                document.querySelector('.doc-item:nth-child(3) button').style.display = 'inline-block';
+                document.querySelector('.doc-item:nth-child(3) button').onclick = () => viewDoc('12th Memo', inter.file_path);
+            } else {
+                document.querySelector('.doc-item:nth-child(3) .font-medium').textContent = 'Not Uploaded';
+                document.querySelector('.doc-item:nth-child(3) .text-xs').textContent = '';
+                document.querySelector('.doc-item:nth-child(3) button').style.display = 'none';
+            }
+        }
+
+        function viewDoc(title, path) {
+            document.getElementById('docTitle').innerText = title;
+            const iframe = document.getElementById('docIframe');
+            const placeholder = document.getElementById('docPlaceholder');
+            
+            if (path) {
+                const filename = path.replace(/^.*[\\\/]/, '');
+                const docUrl = `http://localhost:4003/uploads/${filename}`;
+                iframe.src = docUrl;
+                iframe.style.display = 'block';
+                placeholder.style.display = 'none';
+            } else {
+                iframe.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+            
+            document.getElementById('docModal').style.display = 'flex';
+        }
+
+        async function updateStatus(status) {
+            const token = localStorage.getItem('adminToken');
+            try {
+                const response = await fetch(`${BASE_URL}/applications/${applicationId}/status`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ status: status.toUpperCase() })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    const badge = document.getElementById('statusBadge');
+                    badge.innerText = status.toUpperCase();
+                    if(status === 'Approved') {
+                        badge.className = 'badge badge-success';
+                        alert('Application Approved successfully!');
+                    } else if(status === 'Rejected') {
+                        badge.className = 'badge badge-danger';
+                        alert('Application Rejected.');
+                    }
+                } else {
+                    alert(result.message || 'Failed to update status');
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('Error updating status');
+            }
+        }
+    </script>
+</body>
+</html>

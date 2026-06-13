@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AI Admission System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: var(--color-bg);
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 40;
+        }
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex: 1;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--color-text-light);
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            border-left: 3px solid transparent;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(37, 99, 235, 0.05);
+            color: var(--color-primary);
+        }
+        .nav-item.active {
+            border-left-color: var(--color-primary);
+        }
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Topbar */
+        .topbar {
+            height: 70px;
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--color-bg);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            width: 300px;
+            border: 1px solid var(--color-border);
+        }
+        .search-bar input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            margin-left: 0.5rem;
+            font-family: var(--font-sans);
+        }
+
+        /* Dashboard specific */
+        .dashboard-container {
+            padding: 2rem;
+        }
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .widget-card {
+            padding: 1.5rem;
+        }
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .widget-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .widget-title {
+            color: var(--color-text-light);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .widget-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        @media (max-width: 1024px) {
+            .widget-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="logo text-lg">
+                <i data-lucide="graduation-cap"></i>
+                UniAdmit<span class="text-primary">Admin</span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html" class="nav-item active">
+                <i data-lucide="layout-dashboard" size="20"></i> Dashboard
+            </a>
+            <a href="admin-applications.html" class="nav-item">
+                <i data-lucide="users" size="20"></i> Applications
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="file-text" size="20"></i> Reports
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="settings" size="20"></i> Settings
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="index.html" class="nav-item" style="padding: 0;">
+                <i data-lucide="log-out" size="20"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="search-bar">
+                <i data-lucide="search" size="18" class="text-text-light"></i>
+                <input type="text" placeholder="Search applications...">
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="btn btn-outline" style="padding: 0.5rem; border-color: transparent;">
+                    <i data-lucide="bell" size="20"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                        AD
+                    </div>
+                    <span class="font-medium text-sm">Admin User</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-container">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="mb-1">Dashboard Overview</h2>
+                    <p class="text-text-light text-sm">Welcome back! Here's what's happening with admissions today.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn btn-outline" style="padding: 0.5rem 1rem;">
+                        <i data-lucide="download" size="16"></i> Export Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Widgets -->
+            <div class="widget-grid">
+                <div class="card widget-card">
+                    <div class="widget-header">
+                        <div>
+                            <div class="widget-title">Total Applications</div>
+                            <div class="widget-value">2,451</div>
+                        </div>
+                        <div class="widget-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--color-primary);">
+                            <i data-lucide="file-stack"></i>
+                        </div>
+                    </div>
+                    <div class="text-sm text-success flex items-center gap-1 font-medium">
+                        <i data-lucide="trending-up" size="14"></i> +12.5% from last month
+                    </div>
+                </div>
+                
+                <div class="card widget-card">
+                    <div class="widget-header">
+                        <div>
+                            <div class="widget-title">Approved</div>
+                            <div class="widget-value text-success">842</div>
+                        </div>
+                        <div class="widget-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success);">
+                            <i data-lucide="check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="text-sm text-success flex items-center gap-1 font-medium">
+                        <i data-lucide="trending-up" size="14"></i> +4.2% from last month
+                    </div>
+                </div>
+
+                <div class="card widget-card">
+                    <div class="widget-header">
+                        <div>
+                            <div class="widget-title">Under Review</div>
+                            <div class="widget-value text-warning">453</div>
+                        </div>
+                        <div class="widget-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--color-warning);">
+                            <i data-lucide="clock"></i>
+                        </div>
+                    </div>
+                    <div class="text-sm text-text-light flex items-center gap-1">
+                        Requires attention
+                    </div>
+                </div>
+
+                <div class="card widget-card">
+                    <div class="widget-header">
+                        <div>
+                            <div class="widget-title">Rejected</div>
+                            <div class="widget-value text-danger">156</div>
+                        </div>
+                        <div class="widget-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--color-danger);">
+                            <i data-lucide="x-circle"></i>
+                        </div>
+                    </div>
+                    <div class="text-sm text-danger flex items-center gap-1 font-medium">
+                        <i data-lucide="trending-down" size="14"></i> -2.1% from last month
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="card">
+                    <h3 class="mb-4" style="font-size: 1.1rem;">Application Trends (Last 6 Months)</h3>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="mb-4" style="font-size: 1.1rem;">Status Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Applications Table -->
+            <div class="card" style="padding: 0;">
+                <div class="flex justify-between items-center p-6 border-b border-color-border">
+                    <h3 style="font-size: 1.1rem; margin: 0;">Recent Applications</h3>
+                    <a href="admin-applications.html" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">View All</a>
+                </div>
+                <div class="table-container" style="border: none; border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Applicant</th>
+                                <th>Course</th>
+                                <th>Date Applied</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentApplicationsBody">
+                            <!-- Populated via admin.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

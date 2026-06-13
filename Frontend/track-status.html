@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Application - AI Admission System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: var(--color-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            padding: 1rem 0;
+            background: white;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .main-container {
+            flex: 1;
+            padding: 3rem 1rem;
+        }
+
+        .track-form-card {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 2.5rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-border);
+        }
+
+        .details-container {
+            display: none;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .info-group {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .info-label {
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .doc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            background: var(--color-bg);
+        }
+
+        @media (max-width: 768px) {
+            .details-grid { grid-template-columns: 1fr; }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none; align-items: center; justify-content: center; z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+        .overlay.active { display: flex; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none; align-items: center; justify-content: center; z-index: 110;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white; border-radius: var(--radius-lg); width: 90%; max-width: 800px;
+            max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .modal-header {
+            padding: 1.5rem; border-bottom: 1px solid var(--color-border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-body {
+            padding: 1.5rem; flex: 1; overflow-y: auto; background: var(--color-bg);
+        }
+        .close-modal {
+            cursor: pointer; color: var(--color-text-light); transition: color var(--transition-fast);
+        }
+        .close-modal:hover { color: var(--color-danger); }
+        .iframe-container {
+            width: 100%; height: 60vh; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div class="overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="index.html" class="logo font-bold text-lg text-primary flex items-center gap-2">
+                <i data-lucide="graduation-cap"></i>
+                UniAdmitAI
+            </a>
+            <div class="flex gap-4 items-center">
+                <a href="student-apply.html" class="btn btn-outline" style="padding: 0.5rem 1rem;">Apply Now</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container container">
+        
+        <!-- Track Form -->
+        <div class="track-form-card" id="trackFormCard">
+            <div class="text-center mb-6">
+                <div class="flex justify-center mb-4 text-primary">
+                    <i data-lucide="search" size="48"></i>
+                </div>
+                <h2 class="font-bold text-2xl mb-2">Track Application</h2>
+                <p class="text-text-light text-sm">Enter your Application ID and Date of Birth to check your admission status.</p>
+            </div>
+
+            <form id="trackForm">
+                <div class="form-group">
+                    <label class="form-label" for="appId">Application ID</label>
+                    <input type="number" id="appId" class="form-control" placeholder="e.g. 1,2,3.." required>
+                </div>
+                <div class="form-group mb-6">
+                    <label class="form-label" for="dob">Date of Birth</label>
+                    <input type="date" id="dob" class="form-control" required>
+                </div>
+                
+                <div id="errorMessage" class="text-danger text-sm mb-4" style="display: none; text-align: center;"></div>
+                
+                <button type="submit" class="btn btn-primary w-full" style="justify-content: center;">
+                    Track Status
+                </button>
+            </form>
+        </div>
+
+        <!-- Details Container -->
+        <div class="details-container" id="detailsContainer">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <button class="btn btn-outline mb-4" onclick="resetView()" style="padding: 0.25rem 0.75rem;">
+                        <i data-lucide="arrow-left" size="16"></i> Track Another
+                    </button>
+                    <div class="flex items-center gap-4">
+                        <h2 class="mb-0" id="applicantNameHeader">Loading...</h2>
+                        <span class="badge badge-primary" id="statusBadge">Loading...</span>
+                    </div>
+                </div>
+                <div class="text-sm text-text-light font-mono" id="applicationIdDisplay">ID: ...</div>
+            </div>
+
+            <div class="details-grid">
+                <!-- Left Column -->
+                <div class="flex-col gap-6">
+                    <div class="card">
+                        <h3 class="mb-4">Applicant Information</h3>
+                        
+                        <div class="info-group">
+                            <h4 class="text-primary mb-3 text-sm uppercase tracking-wider">Personal Details</h4>
+                            <div class="info-grid">
+                                <div><div class="info-label">Full Name</div><div class="info-value" id="valFullName">-</div></div>
+                                <div><div class="info-label">Email</div><div class="info-value" id="valEmail">-</div></div>
+                                <div><div class="info-label">Phone</div><div class="info-value" id="valPhone">-</div></div>
+                                <div><div class="info-label">Date of Birth</div><div class="info-value" id="valDob">-</div></div>
+                                <div><div class="info-label">Gender</div><div class="info-value" id="valGender">-</div></div>
+                                <div><div class="info-label">Category</div><div class="info-value" id="valCategory">-</div></div>
+                            </div>
+                        </div>
+
+                        <div class="info-group">
+                            <h4 class="text-primary mb-3 text-sm uppercase tracking-wider">Academic Background</h4>
+                            <div class="info-grid">
+                                <div><div class="info-label">10th Board</div><div class="info-value" id="valTenthBoard">-</div></div>
+                                <div><div class="info-label">10th Percentage</div><div class="info-value" id="valTenthPct">-</div></div>
+                                <div><div class="info-label">12th Board</div><div class="info-value" id="valInterBoard">-</div></div>
+                                <div><div class="info-label">12th Percentage</div><div class="info-value" id="valInterPct">-</div></div>
+                                <div style="grid-column: span 2;"><div class="info-label">Previous School/College</div><div class="info-value" id="valPrevSchool">-</div></div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-group">
+                            <h4 class="text-primary mb-3 text-sm uppercase tracking-wider">Course Applied</h4>
+                            <div class="info-grid">
+                                <div style="grid-column: span 2;"><div class="info-label">Program</div><div class="info-value text-lg font-bold" id="valCourse">-</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="flex-col gap-6">
+                    <div class="card">
+                        <h3 class="mb-4">Uploaded Documents</h3>
+                        
+                        <div class="doc-item" id="doc10thContainer">
+                            <div class="flex items-center gap-3">
+                                <div style="color: #EF4444;"><i data-lucide="file-text" size="24"></i></div>
+                                <div>
+                                    <div class="font-medium text-sm" id="doc10thName">Not Uploaded</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; display: none;" id="btnView10th">View</button>
+                        </div>
+                        
+                        <div class="doc-item" id="doc12thContainer">
+                            <div class="flex items-center gap-3">
+                                <div style="color: #EF4444;"><i data-lucide="file-text" size="24"></i></div>
+                                <div>
+                                    <div class="font-medium text-sm" id="doc12thName">Not Uploaded</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; display: none;" id="btnView12th">View</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Viewer Modal -->
+    <div class="modal" id="docModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="font-bold text-lg" id="docModalTitle">Document View</div>
+                <div class="close-modal" onclick="closeDocModal()">
+                    <i data-lucide="x" size="24"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <iframe id="docIframe" class="iframe-container" src="" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        document.getElementById('trackForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const appId = document.getElementById('appId').value;
+            const dob = document.getElementById('dob').value;
+            const errorMsg = document.getElementById('errorMessage');
+            const overlay = document.getElementById('loadingOverlay');
+            
+            errorMsg.style.display = 'none';
+            overlay.classList.add('active');
+            
+            try {
+                const response = await fetch('http://localhost:4003/api/applications/track', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ applicationId: appId, dateOfBirth: dob })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    populateDetails(result.data);
+                    document.getElementById('trackFormCard').style.display = 'none';
+                    document.getElementById('detailsContainer').style.display = 'block';
+                } else {
+                    errorMsg.textContent = result.message || 'Application not found or invalid details.';
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Tracking Error:', error);
+                errorMsg.textContent = 'Server error. Please try again later.';
+                errorMsg.style.display = 'block';
+            } finally {
+                overlay.classList.remove('active');
+            }
+        });
+
+        function populateDetails(data) {
+            const app = data[0];
+            
+            document.getElementById('applicantNameHeader').textContent = app.full_name;
+            document.getElementById('applicationIdDisplay').textContent = `ID: ${app.id}`;
+            
+            const badge = document.getElementById('statusBadge');
+            badge.innerText = app.status;
+            if (app.status === 'APPROVED') badge.className = 'badge badge-success';
+            else if (app.status === 'REJECTED') badge.className = 'badge badge-danger';
+            else if (app.status === 'UNDER_REVIEW') badge.className = 'badge badge-warning';
+            else badge.className = 'badge badge-primary';
+
+            document.getElementById('valFullName').textContent = app.full_name;
+            document.getElementById('valEmail').textContent = app.email;
+            document.getElementById('valPhone').textContent = app.phone;
+            document.getElementById('valDob').textContent = new Date(app.date_of_birth).toLocaleDateString();
+            document.getElementById('valGender').textContent = app.gender;
+            document.getElementById('valCategory').textContent = app.category;
+            
+            document.getElementById('valTenthBoard').textContent = app.tenth_board || '-';
+            document.getElementById('valTenthPct').textContent = app.tenth_percentage ? app.tenth_percentage + '%' : '-';
+            document.getElementById('valInterBoard').textContent = app.inter_board || '-';
+            document.getElementById('valInterPct').textContent = app.inter_percentage ? app.inter_percentage + '%' : '-';
+            document.getElementById('valPrevSchool').textContent = app.inter_college_name || app.tenth_school_name || '-';
+            document.getElementById('valCourse').textContent = app.course;
+            
+            // Render docs
+            const docs = data.filter(row => row.document_type);
+            const tenth = docs.find(d => d.document_type === 'TENTH_MEMO');
+            const inter = docs.find(d => d.document_type === 'INTER_MEMO');
+
+            if (tenth) {
+                document.getElementById('doc10thName').textContent = tenth.file_name;
+                const btn = document.getElementById('btnView10th');
+                btn.style.display = 'inline-block';
+                btn.onclick = () => viewDoc('10th Memo', tenth.file_path);
+            } else {
+                document.getElementById('doc10thName').textContent = 'Not Uploaded';
+                document.getElementById('btnView10th').style.display = 'none';
+            }
+
+            if (inter) {
+                document.getElementById('doc12thName').textContent = inter.file_name;
+                const btn = document.getElementById('btnView12th');
+                btn.style.display = 'inline-block';
+                btn.onclick = () => viewDoc('12th Memo', inter.file_path);
+            } else {
+                document.getElementById('doc12thName').textContent = 'Not Uploaded';
+                document.getElementById('btnView12th').style.display = 'none';
+            }
+        }
+
+        function viewDoc(title, path) {
+            document.getElementById('docModalTitle').innerText = title;
+            document.getElementById('docIframe').src = 'http://localhost:4003/' + path.replace(/\\/g, '/');
+            document.getElementById('docModal').classList.add('active');
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('active');
+            document.getElementById('docIframe').src = '';
+        }
+
+        function resetView() {
+            document.getElementById('trackFormCard').style.display = 'block';
+            document.getElementById('detailsContainer').style.display = 'none';
+            document.getElementById('trackForm').reset();
+        }
+    </script>
+</body>
+</html>

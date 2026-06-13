@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Enhanced Admission Management System</title>
+    <meta name="description" content="Premium university admission platform powered by AI.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Landing Page Specific Styles */
+        .navbar {
+            padding: 1.5rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+        }
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(79, 70, 229, 0.05) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        /* Decorative Background shapes */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            right: -5%;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(37,99,235,0.1) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            left: -5%;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--color-primary);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+        .hero-title {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+        .hero-desc {
+            font-size: 1.25rem;
+            color: var(--color-text-light);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features {
+            background-color: var(--color-surface);
+        }
+        .feature-card {
+            text-align: center;
+            padding: 2.5rem 2rem;
+        }
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--color-primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            transition: transform var(--transition-normal);
+        }
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .timeline {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background: var(--color-border);
+            transform: translateX(-50%);
+        }
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        .timeline-content {
+            width: calc(50% - 3rem);
+            background: var(--color-surface);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border);
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            border: 4px solid var(--color-bg);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+        }
+
+        footer {
+            background: #0F172A;
+            color: #94A3B8;
+            padding: 4rem 0 2rem;
+        }
+        .footer-logo {
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .timeline::before { left: 24px; }
+            .timeline-item { flex-direction: row !important; }
+            .timeline-content { width: calc(100% - 60px); margin-left: 60px; }
+            .timeline-dot { left: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-content">
+            <a href="index.html" class="logo">
+                <i data-lucide="graduation-cap"></i>
+                UniAdmit<span class="text-primary">AI</span>
+            </a>
+            <div class="flex gap-4 items-center">
+               
+                <a href="admin-login.html" class="btn btn-outline" style="padding: 0.5rem 1rem;">Admin Login</a>
+                <a href="student-apply.html" class="btn btn-primary" style="padding: 0.5rem 1rem;">Apply Now</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i data-lucide="sparkles" size="16"></i>
+                    AI-Powered Admission System
+                </div>
+                <h1 class="hero-title">Transforming University <br/><span class="gradient-text">Admissions with AI</span></h1>
+                <p class="hero-desc">Experience a seamless, intelligent, and paperless journey. Submit applications, upload documents, and track your admission status in real-time.</p>
+                <div class="flex justify-center gap-4">
+                    <a href="student-apply.html" class="btn btn-gradient btn-lg" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                        Start Application <i data-lucide="arrow-right"></i>
+                    </a>
+                    <a href="track-status.html" class="btn btn-outline btn-lg" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                        Track Status
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features py-20">
+        <div class="container">
+            <div class="text-center mb-8">
+                <h2 class="font-bold text-primary mb-2">Why Choose Us</h2>
+                <h3 style="font-size: 2.5rem; margin-bottom: 1rem;">Premium Features for Modern Education</h3>
+                <p class="text-text-light" style="max-width: 600px; margin: 0 auto;">Our platform is designed to provide the best experience for both students and administrators.</p>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-8 mt-8">
+                <div class="card feature-card">
+                    <div class="feature-icon"><i data-lucide="zap" size="32"></i></div>
+                    <h4>Lightning Fast</h4>
+                    <p class="text-text-light">Streamlined multi-step application form that saves your progress automatically.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon"><i data-lucide="shield-check" size="32"></i></div>
+                    <h4>Secure Documents</h4>
+                    <p class="text-text-light">Upload your academic records securely. Our system ensures your data is protected.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon"><i data-lucide="line-chart" size="32"></i></div>
+                    <h4>Real-time Tracking</h4>
+                    <p class="text-text-light">Know exactly where your application stands with instant status updates and notifications.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admission Process Timeline -->
+    <section class="py-20">
+        <div class="container">
+            <div class="text-center mb-8">
+                <h3 style="font-size: 2.5rem; margin-bottom: 1rem;">The Admission Process</h3>
+                <p class="text-text-light" style="max-width: 600px; margin: 0 auto;">Four simple steps to secure your future.</p>
+            </div>
+
+            <div class="timeline mt-8">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                            <i data-lucide="file-text" size="20"></i> Step 1
+                        </div>
+                        <h4>Submit Application</h4>
+                        <p class="text-text-light">Fill in your personal, academic, and course preferences in our intuitive wizard.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                            <i data-lucide="upload-cloud" size="20"></i> Step 2
+                        </div>
+                        <h4>Upload Documents</h4>
+                        <p class="text-text-light">Securely upload your 10th and Intermediate memos, and any additional required files.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="flex items-center gap-2 mb-2 text-primary font-bold">
+                            <i data-lucide="eye" size="20"></i> Step 3
+                        </div>
+                        <h4>Admin Review</h4>
+                        <p class="text-text-light">Our dedicated admission team will review your application and verify your documents.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="flex items-center gap-2 mb-2 text-success font-bold">
+                            <i data-lucide="check-circle" size="20"></i> Step 4
+                        </div>
+                        <h4>Approval & Admission</h4>
+                        <p class="text-text-light">Receive your acceptance letter and proceed with enrollment!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="grid grid-cols-4 gap-8 mb-8">
+                <div style="grid-column: span 2;">
+                    <a href="#" class="logo footer-logo mb-4">
+                        <i data-lucide="graduation-cap"></i> UniAdmitAI
+                    </a>
+                    <p style="max-width: 300px; margin-bottom: 1.5rem;">Empowering the next generation of students with an intelligent, seamless admission experience.</p>
+                    <div class="flex gap-4">
+                        <!-- Social placeholders -->
+                        <a href="#" style="color: #94A3B8;"><i data-lucide="twitter"></i></a>
+                        <a href="#" style="color: #94A3B8;"><i data-lucide="linkedin"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h5 style="color: white; margin-bottom: 1rem;">Resources</h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li class="mb-2"><a href="#" style="color: #94A3B8;">Help Center</a></li>
+                        <li class="mb-2"><a href="#" style="color: #94A3B8;">Admission Guidelines</a></li>
+                        <li class="mb-2"><a href="#" style="color: #94A3B8;">Contact Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 style="color: white; margin-bottom: 1rem;">Legal</h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li class="mb-2"><a href="#" style="color: #94A3B8;">Privacy Policy</a></li>
+                        <li class="mb-2"><a href="#" style="color: #94A3B8;">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid #1E293B; padding-top: 2rem; text-align: center; font-size: 0.875rem;">
+                &copy; 2026 UniAdmitAI. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

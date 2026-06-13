@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Submitted - AI Admission System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: var(--color-bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .success-card {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            padding: 4rem 2rem;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-icon-wrapper {
+            width: 96px;
+            height: 96px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem auto;
+            color: var(--color-success);
+            position: relative;
+        }
+        
+        .success-icon-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.05);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .app-id-box {
+            background: var(--color-bg);
+            border: 2px dashed var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .app-id {
+            font-family: monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card success-card glass">
+        <div class="success-icon-wrapper">
+            <i data-lucide="check-circle" size="48"></i>
+        </div>
+        
+        <h1 class="mb-2">Application Submitted Successfully!</h1>
+        <p class="text-text-light text-lg mb-6">Thank you for applying. Your application is now under review by our admission team.
+            Track your Application status in the portal..
+        </p>
+        
+        <div class="app-id-box">
+            <p class="text-sm text-text-light mb-2 uppercase font-bold tracking-wide">Your Application ID</p>
+            <div class="app-id" id="applicationIdDisplay">APP-######</div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mt-8">
+            <button class="btn btn-outline" onclick="window.print()">
+                <i data-lucide="printer"></i> Print Receipt
+            </button>
+            <a href="index.html" class="btn btn-primary">
+                Return to Home <i data-lucide="home"></i>
+            </a>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Extract ID from URL
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (id) {
+                document.getElementById('applicationIdDisplay').textContent = id;
+            } else {
+                // Fallback random ID if directly accessed
+                document.getElementById('applicationIdDisplay').textContent = 'APP-' + Math.floor(100000 + Math.random() * 900000);
+            }
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
