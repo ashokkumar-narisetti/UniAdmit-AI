@@ -44,7 +44,7 @@ await academicRepository.createAcademicRecord({
 });
 const mlResponse =
   await axios.post(
-    "http://localhost:5000/predict",
+    `${process.env.ML_API_URL}/predict`,
     {
       tenthPercentage:
         Number(data.tenthPercentage),

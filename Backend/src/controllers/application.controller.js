@@ -189,7 +189,7 @@ const getApplicationPrediction = async (req, res) => {
     };
 
     // Make the request to the Flask server
-    const mlResponse = await fetch("http://localhost:5000/predict", {
+    const mlResponse = await fetch(`${process.env.ML_API_URL}/predict`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(mlPayload)
