@@ -127,20 +127,24 @@ function initCharts(stats) {
     const danger = root.getPropertyValue('--color-danger').trim() || '#ef4444';
     const indigo = root.getPropertyValue('--color-indigo').trim() || '#4f46e5';
 
-    // Trend Chart (Bar/Line) - using dummy trend data since backend doesn't provide it
+    const labels = stats.trends && stats.trends.length > 0 ? stats.trends.map(t => t.month) : ['No Data'];
+    const newAppsData = stats.trends && stats.trends.length > 0 ? stats.trends.map(t => Number(t.new_applications) || 0) : [0];
+    const admissionsData = stats.trends && stats.trends.length > 0 ? stats.trends.map(t => Number(t.admissions) || 0) : [0];
+
+    // Trend Chart (Bar/Line) - using dynamic trend data from backend
     const ctxTrend = trendCanvas.getContext('2d');
     new Chart(ctxTrend, {
         type: 'bar',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            labels: labels,
             datasets: [{
                 label: 'New Applications',
-                data: [65, 59, 80, 81, 150, 240],
+                data: newAppsData,
                 backgroundColor: primary,
                 borderRadius: 4,
             }, {
                 label: 'Admissions',
-                data: [40, 45, 60, 50, 100, 150],
+                data: admissionsData,
                 backgroundColor: indigo,
                 borderRadius: 4,
             }]

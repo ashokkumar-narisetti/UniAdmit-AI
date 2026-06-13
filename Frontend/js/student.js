@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    form.addEventListener('submit', (e) => {
+    submitBtn.addEventListener('click', (e) => {
         e.preventDefault();
         if (validateStep(currentStep)) {
             submitApplication();
@@ -295,15 +295,12 @@ async function submitApplication() {
             );
         }
 
-        const applicationId =
-            result.data.id;
+        const dbId = result.data.id;
+        const appTrackingId = result.data.applicationId;
 
-        await uploadDocuments(
-            applicationId
-        );
+        await uploadDocuments(dbId);
 
-        window.location.href =
-            `student-success.html?id=${applicationId}`;
+        window.location.href = `student-success.html?id=${dbId}`;
 
     } catch (error) {
 

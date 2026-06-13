@@ -64,11 +64,14 @@ const getAllApplications = async () => {
   return rows;
 };
 const getApplicationById = async (id) => {
+  const isTrackingId = String(id).startsWith("APP-");
+  const whereClause = isTrackingId ? "application_id = ?" : "id = ?";
+
   const [rows] = await pool.execute(
     `
     SELECT *
     FROM applications
-    WHERE id = ?
+    WHERE ${whereClause}
     `,
     [id]
   );
@@ -93,42 +96,45 @@ const updateApplicationStatus = async (
 };
 const getFullApplicationById = async (id) => {
 
-  const [rows] = await pool.execute(
-    `
-    SELECT
+    const isTrackingId = String(id).startsWith("APP-");
+    const whereClause = isTrackingId ? "a.application_id = ?" : "a.id = ?";
 
-      a.*,
-
-      ar.tenth_school_name,
-      ar.tenth_board,
-      ar.tenth_passout_year,
-      ar.tenth_percentage,
-      ar.tenth_attendance,
-
-      ar.inter_college_name,
-      ar.inter_board,
-      ar.inter_passout_year,
-      ar.inter_percentage,
-      ar.inter_attendance,
-
-      d.document_type,
-      d.file_name,
-      d.file_path
-
-    FROM applications a
-
-    LEFT JOIN academic_records ar
-      ON a.id = ar.application_id
-
-    LEFT JOIN documents d
-      ON a.id = d.application_id
-
-    WHERE a.id = ?
-    `,
-    [id]
-  );
-
-  return rows;
+    const [rows] = await pool.execute(
+      `
+      SELECT
+  
+        a.*,
+  
+        ar.tenth_school_name,
+        ar.tenth_board,
+        ar.tenth_passout_year,
+        ar.tenth_percentage,
+        ar.tenth_attendance,
+  
+        ar.inter_college_name,
+        ar.inter_board,
+        ar.inter_passout_year,
+        ar.inter_percentage,
+        ar.inter_attendance,
+  
+        d.document_type,
+        d.file_name,
+        d.file_path
+  
+      FROM applications a
+  
+      LEFT JOIN academic_records ar
+        ON a.id = ar.application_id
+  
+      LEFT JOIN documents d
+        ON a.id = d.application_id
+  
+      WHERE ${whereClause}
+      `,
+      [id]
+    );
+  
+    return rows;
 };
 const updateEligibilityPrediction = async (
   applicationId,
