@@ -27,3 +27,17 @@ env/
 
 # Logs
 *.log
+
+Backend/test-api-auth.js
+Backend/test-api.js
+Backend/test-date.js
+Backend/test-date2.js
+Backend/test-gemini-ipv4.js
+Backend/test-gemini.js
+Backend/test-https.js
+Backend/test-models.js
+Backend/test-query-app.js
+Backend/test-query.js
+Backend/test-recent.js
+Backend/test-track.js
+Backend/generatehash.js
