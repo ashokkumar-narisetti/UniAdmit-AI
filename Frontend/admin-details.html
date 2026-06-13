@@ -285,7 +285,7 @@
 
     <script src="js/main.js"></script>
     <script>
-        const BASE_URL = 'http://localhost:4003/api';
+        const BASE_URL = 'https://uniadmit-ai-1-backend.onrender.com/api';
         const urlParams = new URLSearchParams(window.location.search);
         const applicationId = urlParams.get('id');
 
@@ -438,7 +438,7 @@
             
             if (path) {
                 const filename = path.replace(/^.*[\\\/]/, '');
-                const docUrl = `http://localhost:4003/uploads/${filename}`;
+                const docUrl = `https://uniadmit-ai-1-backend.onrender.com/uploads/${filename}`;
                 iframe.src = docUrl;
                 iframe.style.display = 'block';
                 placeholder.style.display = 'none';

@@ -266,7 +266,7 @@ async function submitApplication() {
 
         const response =
             await fetch(
-                "http://localhost:4003/api/applications",
+                "https://uniadmit-ai-1-backend.onrender.com/api/applications",
                 {
                     method: "POST",
                     headers: {
@@ -334,7 +334,7 @@ async function uploadDocuments(applicationId) {
 
         const uploadResponse =
     await fetch(
-        "http://localhost:4003/api/documents/upload",
+        "https://uniadmit-ai-1-backend.onrender.com/api/documents/upload",
         {
             method: "POST",
             body: fd
@@ -359,7 +359,7 @@ console.log(uploadResult);
 
     const uploadResponse =
         await fetch(
-            "http://localhost:4003/api/documents/upload",
+            "https://uniadmit-ai-1-backend.onrender.com/api/documents/upload",
             {
                 method: "POST",
                 body: fd

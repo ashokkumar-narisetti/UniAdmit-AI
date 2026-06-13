@@ -1,6 +1,6 @@
 /* js/admin.js */
 
-const BASE_URL = 'http://localhost:4003/api';
+const BASE_URL = 'https://uniadmit-ai-1-backend.onrender.com/api';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Check authentication
