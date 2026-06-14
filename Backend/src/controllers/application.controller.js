@@ -189,17 +189,22 @@ const getApplicationPrediction = async (req, res) => {
     };
 
     // Make the request to the Flask server
-    const mlResponse = await fetch(`${process.env.ML_API_URL}/predict`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(mlPayload)
-    });
-
-    if (!mlResponse.ok) {
-      throw new Error(`ML server returned ${mlResponse.status}`);
+    let mlResult = { prediction: "UNKNOWN", confidence: 0 };
+    try {
+      const mlResponse = await fetch(`${process.env.ML_API_URL}/predict`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(mlPayload)
+      });
+  
+      if (mlResponse.ok) {
+        mlResult = await mlResponse.json();
+      } else {
+        console.warn(`ML server returned ${mlResponse.status}`);
+      }
+    } catch (err) {
+      console.warn("Could not reach ML Server:", err.message);
     }
-
-    const mlResult = await mlResponse.json();
 
     // Call Gemini API for recommendation
     const studentData = {

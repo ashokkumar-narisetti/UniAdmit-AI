@@ -42,35 +42,32 @@ await academicRepository.createAcademicRecord({
   interPercentage: data.interPercentage,
   interAttendance: data.interAttendance,
 });
-const mlResponse =
-  await axios.post(
+let prediction = "PENDING";
+let confidence = 0;
+
+try {
+  const mlResponse = await axios.post(
     `${process.env.ML_API_URL}/predict`,
     {
-      tenthPercentage:
-        Number(data.tenthPercentage),
-
-      tenthAttendance:
-        Number(data.tenthAttendance),
-
-      interPercentage:
-        Number(data.interPercentage),
-
-      interAttendance:
-        Number(data.interAttendance)
+      tenthPercentage: Number(data.tenthPercentage),
+      tenthAttendance: Number(data.tenthAttendance),
+      interPercentage: Number(data.interPercentage),
+      interAttendance: Number(data.interAttendance)
     }
   );
+  prediction = mlResponse.data.prediction;
+  confidence = mlResponse.data.confidence;
+  console.log("ML Prediction:", mlResponse.data);
+} catch (error) {
+  console.error("ML Prediction Failed during application submission. Setting to PENDING.", error.message);
+}
 
 await applicationRepository
   .updateEligibilityPrediction(
     id,
-    mlResponse.data.prediction,
-    mlResponse.data.confidence
+    prediction,
+    confidence
   );
-
-console.log(
-  "ML Prediction:",
-  mlResponse.data
-);
 return {
   id,
   applicationId,
