@@ -374,9 +374,13 @@
         }
 
         function viewDoc(title, path) {
-            document.getElementById('docModalTitle').innerText = title;
-            document.getElementById('docIframe').src = 'https://uniadmit-ai-1-backend.onrender.com/' + path.replace(/\\/g, '/');
-            document.getElementById('docModal').classList.add('active');
+            if (path) {
+                const filename = path.replace(/^.*[\\\/]/, '');
+                const docUrl = `https://uniadmit-ai-1-backend.onrender.com/uploads/${filename}`;
+                window.open(docUrl, '_blank');
+            } else {
+                alert("Document not uploaded.");
+            }
         }
 
         function closeDocModal() {
