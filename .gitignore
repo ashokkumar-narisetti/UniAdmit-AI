@@ -27,7 +27,8 @@ env/
 
 # Logs
 *.log
-
+Backend/.uploads/*
+!Backend/.uploads/.gitkeep
 Backend/test-api-auth.js
 Backend/test-api.js
 Backend/test-date.js
